@@ -187,7 +187,6 @@ def battle(env, n_round, map_size, max_steps, handles, models, print_every, eps=
             rewards[i] = sum_reward / nums[i]
             mean_rewards[i].append(rewards[i])
             total_rewards[i].append(sum_reward)
-
         if render:
             env.render()
 

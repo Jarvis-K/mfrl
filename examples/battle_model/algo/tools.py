@@ -372,7 +372,8 @@ class Runner(object):
         # pass
         info['main'] = {'ave_agent_reward': 0., 'total_reward': 0., 'kill': 0.}
         info['opponent'] = {'ave_agent_reward': 0., 'total_reward': 0., 'kill': 0.}
-
+        # print( 'every is ',self.render_every)
+        # print('render is',(iteration + 1) % self.render_every if self.render_every > 0 else False)
         max_nums, nums, agent_r_records, total_rewards = self.play(env=self.env, n_round=iteration, map_size=self.map_size, max_steps=self.max_steps, handles=self.handles,
                     models=self.models, print_every=50, eps=variant_eps, render=(iteration + 1) % self.render_every if self.render_every > 0 else False, use_mean=use_mean, train=self.train)
         

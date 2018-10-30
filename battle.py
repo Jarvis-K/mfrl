@@ -45,7 +45,7 @@ if __name__ == '__main__':
     models[0].load(main_model_dir, step=args.idx[0])
     models[1].load(oppo_model_dir, step=args.idx[1])
 
-    runner = tools.Runner(sess, env, handles, args.map_size, args.max_steps, models, battle, render_every=0)
+    runner = tools.Runner(sess, env, handles, args.map_size, args.max_steps, models, battle, render_every=2 if args.render else 0)
     win_cnt = {'main': 0, 'opponent': 0}
 
     for k in range(0, args.n_round):
