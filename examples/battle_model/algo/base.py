@@ -127,6 +127,8 @@ class ValueNet:
 
         if self.use_mf:
             assert kwargs.get('prob', None) is not None
+            # print(len(kwargs['prob']))
+            # print(len(kwargs['state'][0]))
             assert len(kwargs['prob']) == len(kwargs['state'][0])
             feed_dict[self.act_prob_input] = kwargs['prob']
 

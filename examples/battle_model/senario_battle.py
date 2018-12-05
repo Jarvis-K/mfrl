@@ -29,9 +29,21 @@ def generate_map(env, map_size, handles):
         for y in range((height - side)//2, (height - side)//2 + side, 2):
             pos.append([x, y, 0])
     env.add_agents(handles[rightID], method="custom", pos=pos)
+def get_mean_acts(env,handle,acts_onehot,nei_len):
+    poss=env.get_pos(handle)
+    nei_space=nei_len**2
+    act_prob=[]
+    for i in range(poss.shape[0]):
+        act_p=np.zeros(env.get_action_space(handle)[0])
+        for j in range(poss.shape[0]):
+            if i != j:
+                if np.sum(np.square(poss[i]-poss[j]))<nei_space:
+                    act_p+=acts_onehot[j]
+        act_p/=j
+        act_prob.append(act_p)
+    return act_prob
 
-
-def play(env, n_round, map_size, max_steps, handles, models, print_every, eps=1.0, render=False, use_mean=False, train=False):
+def play(env, n_round, map_size, max_steps, handles, models, print_every, eps=1.0, render=False, use_mean=False, train=False,nei_len=10):
     """play a ground and train"""
     env.reset()
     generate_map(env, map_size, handles)
@@ -43,6 +55,7 @@ def play(env, n_round, map_size, max_steps, handles, models, print_every, eps=1.
     state = [None for _ in range(n_group)]
     acts = [None for _ in range(n_group)]
     ids = [None for _ in range(n_group)]
+    ids_=[None for _ in range(n_group)]
 
     alives = [None for _ in range(n_group)]
     rewards = [None for _ in range(n_group)]
@@ -59,16 +72,28 @@ def play(env, n_round, map_size, max_steps, handles, models, print_every, eps=1.
 
     if use_mean:
         former_act_prob = [np.zeros((1, env.get_action_space(handles[0])[0])), np.zeros((1, env.get_action_space(handles[1])[0]))]
-
+        for i in range(n_group):
+            state[i] = list(env.get_observation(handles[i]))
+            former_act_prob[i] = np.tile(former_act_prob[i], (len(state[i][0]), 1))
+    
     while not done and step_ct < max_steps:
         # take actions for every model
         for i in range(n_group):
             state[i] = list(env.get_observation(handles[i]))
             ids[i] = env.get_agent_id(handles[i])
+            
 
         if use_mean:
             for i in range(n_group):
-                former_act_prob[i] = np.tile(former_act_prob[i], (len(state[i][0]), 1))
+                # former_act_prob[i] = np.tile(former_act_prob[i], (len(state[i][0]), 1))
+                # print(former_act_prob[i].shape)
+                # print(len(former_act_prob[i]))
+                if len(former_act_prob[i]) != len(state[i][0]):
+                    former_act_prob_=[]
+                    for j in range(len(ids_[i])):
+                        if ids_[i][j] in ids[i]:
+                            former_act_prob_.append(former_act_prob[i][j])
+                    former_act_prob[i]=former_act_prob_
                 acts[i] = models[i].act(state=state[i], prob=former_act_prob[i], eps=eps)
         else:
             for i in range(n_group):
@@ -89,11 +114,16 @@ def play(env, n_round, map_size, max_steps, handles, models, print_every, eps=1.
             'alives': alives[0], 'ids': ids[0]
         }
         
+    
         if use_mean:
             buffer['prob'] = former_act_prob[0]
 
             for i in range(n_group):
-                former_act_prob[i] = np.mean(list(map(lambda x: np.eye(n_action[i])[x], acts[i])), axis=0, keepdims=True)
+                ids_[i]=ids[i]
+                act_onehot=np.eye(n_action[i])[np.array(acts[i])]
+                former_act_prob[i]= get_mean_acts(env,handles[i],act_onehot,nei_len)
+                # print(len(former_act_prob[i]))
+                # former_act_prob[i] = np.mean(list(map(lambda x: np.eye(n_action[i])[x], acts[i])), axis=0, keepdims=True)
         
         if train:
             models[0].flush_buffer(**buffer)
@@ -143,6 +173,7 @@ def battle(env, n_round, map_size, max_steps, handles, models, print_every, eps=
     acts = [None for _ in range(n_group)]
     ids = [None for _ in range(n_group)]
 
+
     alives = [None for _ in range(n_group)]
     rewards = [None for _ in range(n_group)]
     nums = [env.get_num(handle) for handle in handles]
@@ -153,8 +184,9 @@ def battle(env, n_round, map_size, max_steps, handles, models, print_every, eps=
     print("\n\n[*] ROUND #{0}, EPS: {1:.2f} NUMBER: {2}".format(n_round, eps, nums))
     mean_rewards = [[] for _ in range(n_group)]
     total_rewards = [[] for _ in range(n_group)]
-
     former_act_prob = [np.zeros((1, env.get_action_space(handles[0])[0])), np.zeros((1, env.get_action_space(handles[1])[0]))]
+
+    # former_act_prob = [np.tile(np.zeros((1, env.get_action_space(handles[0])[0])),4), np.tile(np.zeros((1, env.get_action_space(handles[1])[0])),4)]
 
     while not done and step_ct < max_steps:
         # take actions for every model
@@ -165,6 +197,7 @@ def battle(env, n_round, map_size, max_steps, handles, models, print_every, eps=
         for i in range(n_group):
             former_act_prob[i] = np.tile(former_act_prob[i], (len(state[i][0]), 1))
             acts[i] = models[i].act(state=state[i], prob=former_act_prob[i], eps=eps)
+            # print('\n',i,'\t',acts[i])
 
         for i in range(n_group):
             env.set_action(handles[i], acts[i])

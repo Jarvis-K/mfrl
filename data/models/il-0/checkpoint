@@ -1,0 +1,2 @@
+model_checkpoint_path: "/home/gomoku/Documents/mean-feild/mfrl/data/models/il-0/dqn_1997"
+all_model_checkpoint_paths: "/home/gomoku/Documents/mean-feild/mfrl/data/models/il-0/dqn_1997"
