@@ -1,2 +1,0 @@
-model_checkpoint_path: "/home/gomoku/Documents/mean-feild/mfrl/data/models/il-1/dqn_best"
-all_model_checkpoint_paths: "/home/gomoku/Documents/mean-feild/mfrl/data/models/il-1/dqn_best"

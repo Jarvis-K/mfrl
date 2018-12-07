@@ -304,7 +304,7 @@ class SummaryObj:
 
 class Runner(object):
     def __init__(self, sess, env, handles, map_size, max_steps, models,
-                play_handle, render_every=None, save_every=None, tau=None, log_name=None, log_dir=None, model_dir=None, train=False,len_nei):
+                play_handle, render_every=None, save_every=None, tau=None, log_name=None, log_dir=None, model_dir=None, train=False,len_nei=40):
         """Initialize runner
 
         Parameters
@@ -347,7 +347,6 @@ class Runner(object):
         self.model_dir = model_dir
         self.train = train
         self.len_nei=len_nei
-
         if self.train:
             self.summary = SummaryObj(log_name=log_name, log_dir=log_dir)
 
@@ -395,8 +394,8 @@ class Runner(object):
                 print(Color.INFO.format('[INFO] Saving model ...'))
                 # self.models[0].save(self.model_dir + '-0', iteration)
                 # self.models[1].save(self.model_dir + '-1', iteration)
-                self.models[0].save(self.model_dir + '-0', 'best')
-                self.models[1].save(self.model_dir + '-1', 'best')
+                self.models[0].save(self.model_dir + '-0', str(self.len_nei)+'best')
+                self.models[1].save(self.model_dir + '-1', str(self.len_nei)+'best')
                 self.summary.write(info['main'], iteration)
         else:
             print('\n[INFO] {0} \n {1}'.format(info['main'], info['opponent']))
