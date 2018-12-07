@@ -76,9 +76,10 @@ class ValueNet:
         concat_layer = tf.concat([h_obs, h_emb], axis=1)
 
         if self.use_mf:
-            prob_emb = tf.layers.dense(self.act_prob_input, units=64, activation=active_func, name='Prob-Emb')
-            h_act_prob = tf.layers.dense(prob_emb, units=32, activation=active_func, name="Dense-Act-Prob")
-            concat_layer = tf.concat([concat_layer, h_act_prob], axis=1)
+            # prob_emb = tf.layers.dense(self.act_prob_input, units=64, activation=active_func, name='Prob-Emb')
+            # h_act_prob = tf.layers.dense(prob_emb, units=32, activation=active_func, name="Dense-Act-Prob")
+            # concat_layer = tf.concat([concat_layer, h_act_prob], axis=1)
+            concat_layer = tf.concat([concat_layer, self.act_prob_input], axis=1)
 
         dense2 = tf.layers.dense(concat_layer, units=128, activation=active_func, name="Dense2")
         out = tf.layers.dense(dense2, units=64, activation=active_func, name="Dense-Out")

@@ -34,16 +34,18 @@ def get_mean_acts(env,handle,acts_onehot,nei_len):
     nei_space=nei_len**2
     act_prob=[]
     for i in range(poss.shape[0]):
+        sum_cnt=0
         act_p=np.zeros(env.get_action_space(handle)[0])
         for j in range(poss.shape[0]):
             if i != j:
                 if np.sum(np.square(poss[i]-poss[j]))<nei_space:
                     act_p+=acts_onehot[j]
-        act_p/=j
+                    sum_cnt+=1
+        act_p/=sum_cnt
         act_prob.append(act_p)
     return act_prob
 
-def play(env, n_round, map_size, max_steps, handles, models, print_every, eps=1.0, render=False, use_mean=False, train=False,nei_len=10):
+def play(env, n_round, map_size, max_steps, handles, models, print_every, eps=1.0, render=False, use_mean=False, train=False,len_nei=40):
     """play a ground and train"""
     env.reset()
     generate_map(env, map_size, handles)
@@ -121,7 +123,7 @@ def play(env, n_round, map_size, max_steps, handles, models, print_every, eps=1.
             for i in range(n_group):
                 ids_[i]=ids[i]
                 act_onehot=np.eye(n_action[i])[np.array(acts[i])]
-                former_act_prob[i]= get_mean_acts(env,handles[i],act_onehot,nei_len)
+                former_act_prob[i]= get_mean_acts(env,handles[i],act_onehot,len_nei)
                 # print(len(former_act_prob[i]))
                 # former_act_prob[i] = np.mean(list(map(lambda x: np.eye(n_action[i])[x], acts[i])), axis=0, keepdims=True)
         

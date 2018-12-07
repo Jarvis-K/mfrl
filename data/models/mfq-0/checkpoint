@@ -1,2 +1,2 @@
-model_checkpoint_path: "/home/gomoku/Documents/mean-feild/mfrl/data/models/mfq-0/mfq_1342"
-all_model_checkpoint_paths: "/home/gomoku/Documents/mean-feild/mfrl/data/models/mfq-0/mfq_1342"
+model_checkpoint_path: "/home/gomoku/Documents/mean-feild/mfrl/data/models/mfq-0/mfq_best"
+all_model_checkpoint_paths: "/home/gomoku/Documents/mean-feild/mfrl/data/models/mfq-0/mfq_best"

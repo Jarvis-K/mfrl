@@ -304,7 +304,7 @@ class SummaryObj:
 
 class Runner(object):
     def __init__(self, sess, env, handles, map_size, max_steps, models,
-                play_handle, render_every=None, save_every=None, tau=None, log_name=None, log_dir=None, model_dir=None, train=False):
+                play_handle, render_every=None, save_every=None, tau=None, log_name=None, log_dir=None, model_dir=None, train=False,len_nei):
         """Initialize runner
 
         Parameters
@@ -346,6 +346,7 @@ class Runner(object):
         self.play = play_handle
         self.model_dir = model_dir
         self.train = train
+        self.len_nei=len_nei
 
         if self.train:
             self.summary = SummaryObj(log_name=log_name, log_dir=log_dir)
@@ -375,7 +376,7 @@ class Runner(object):
         # print( 'every is ',self.render_every)
         # print('render is',(iteration + 1) % self.render_every if self.render_every > 0 else False)
         max_nums, nums, agent_r_records, total_rewards = self.play(env=self.env, n_round=iteration, map_size=self.map_size, max_steps=self.max_steps, handles=self.handles,
-                    models=self.models, print_every=50, eps=variant_eps, render=(iteration + 1) % self.render_every if self.render_every > 0 else False, use_mean=use_mean, train=self.train)
+                    models=self.models, print_every=50, eps=variant_eps, render=(iteration + 1) % self.render_every if self.render_every > 0 else False, use_mean=use_mean, train=self.train,len_nei=self.len_nei)
         
         for i, tag in enumerate(['main', 'opponent']):
             info[tag]['total_reward'] = total_rewards[i]
@@ -392,9 +393,10 @@ class Runner(object):
                 print(Color.INFO.format('[INFO] Self-play Updated!\n'))
 
                 print(Color.INFO.format('[INFO] Saving model ...'))
-                self.models[0].save(self.model_dir + '-0', iteration)
-                self.models[1].save(self.model_dir + '-1', iteration)
-
+                # self.models[0].save(self.model_dir + '-0', iteration)
+                # self.models[1].save(self.model_dir + '-1', iteration)
+                self.models[0].save(self.model_dir + '-0', 'best')
+                self.models[1].save(self.model_dir + '-1', 'best')
                 self.summary.write(info['main'], iteration)
         else:
             print('\n[INFO] {0} \n {1}'.format(info['main'], info['opponent']))

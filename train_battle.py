@@ -24,6 +24,7 @@ if __name__ == '__main__':
     parser.add_argument('--render', action='store_true', help='render or not (if true, will render every save)')
     parser.add_argument('--map_size', type=int, default=40, help='set the size of map')  # then the amount of agents is 64
     parser.add_argument('--max_steps', type=int, default=400, help='set the max steps')
+    parser.add_argument('--len_nei',type=int,default=40)
 
     args = parser.parse_args()
 
@@ -52,7 +53,7 @@ if __name__ == '__main__':
     writer0 = tf.summary.FileWriter('./data/graphs/', sess.graph)
     runner = tools.Runner(sess, env, handles, args.map_size, args.max_steps, models, play,
                             render_every=args.save_every if args.render else 0, save_every=args.save_every, tau=0.01, log_name=args.algo, 
-                            log_dir=log_dir, model_dir=model_dir, train=True)
+                            log_dir=log_dir, model_dir=model_dir, train=True,len_nei=args.len_nei)
 
     for k in range(start_from, start_from + args.n_round):
         eps = magent.utility.piecewise_decay(k, [0, 700, 1400], [1, 0.2, 0.05])
